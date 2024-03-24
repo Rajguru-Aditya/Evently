@@ -1,0 +1,31 @@
+{
+  "name": "evently-server",
+  "version": "1.0.0",
+  "description": "event manager app backend",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "nodemon index.js",
+    "dev": "nodemon index.js"
+  },
+  "keywords": [
+    "event",
+    "manager",
+    "server"
+  ],
+  "author": "Aditya Rajguru",
+  "license": "ISC",
+  "dependencies": {
+    "bcrypt": "^5.1.1",
+    "dotenv": "^16.4.4",
+    "express": "^4.18.2",
+    "express-async-handler": "^1.2.0",
+    "jsonwebtoken": "^9.0.2",
+    "mysql": "^2.18.1",
+    "mysql2": "^3.9.2",
+    "nodemon": "^3.0.3",
+    "pg": "^8.11.3",
+    "sequelize": "^6.37.1",
+    "uuid": "^9.0.1"
+  }
+}
