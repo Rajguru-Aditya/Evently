@@ -35,6 +35,7 @@ const createEvent = asyncHandler(async (req, res) => {
   try {
     // Extract event details from request body or wherever they come from
     const eventData = {
+      userId: req.user.id,
       title: req.body.title,
       description: req.body.description,
       date: req.body.date,

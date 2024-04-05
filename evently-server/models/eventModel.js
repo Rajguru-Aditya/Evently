@@ -3,6 +3,10 @@ const { sequelize } = require("../config/dbConnection");
 const { v4: uuidv4 } = require("uuid");
 
 const Event = sequelize.define("Event", {
+  userId: {
+    type: DataTypes.UUID,
+    allowNull: false,
+  },
   id: {
     type: DataTypes.UUID,
     primaryKey: true,

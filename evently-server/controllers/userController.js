@@ -1,5 +1,7 @@
 const asyncHandler = require("express-async-handler");
 const User = require("../models/userModel");
+const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
 
 // const User = require('../models/userModel');
 
@@ -43,11 +45,40 @@ const createUser = asyncHandler(async (req, res) => {
 
     console.log("User data:", userData);
 
-    // Create the user in the database
-    const createdUser = await User.create(userData);
+    if (!userData.name || !userData.email || !userData.password) {
+      res.status(400);
+      throw new Error("Please provide username, email and password");
+    }
 
-    // Respond with the created user
-    res.status(201).json(createdUser);
+    const userExists = await User.findOne({
+      where: {
+        email: userData.email,
+      },
+    });
+
+    if (userExists) {
+      res.status(400);
+      throw new Error("User already exists");
+    }
+
+    const hashedPassword = await bcrypt.hash(userData.password, 10);
+
+    // create user in db
+    const user = await User.create({
+      name: userData.name,
+      email: userData.email,
+      password: hashedPassword,
+    });
+
+    if (user) {
+      res.status(201).json({
+        message: "User created successfully",
+        data: user,
+      });
+    } else {
+      res.status(400);
+      throw new Error("Invalid user data");
+    }
   } catch (error) {
     console.error("Error creating user:", error);
     res.status(500).json({ message: "Internal server error" });
@@ -105,10 +136,56 @@ const deleteUser = asyncHandler(async (req, res) => {
   });
 });
 
+const loginUser = asyncHandler(async (req, res) => {
+  console.log("Login Request body: ", req.body);
+
+  const { email, password } = req.body;
+
+  if (!email || !password) {
+    res.status(400);
+    throw new Error("Please provide email and password");
+  }
+
+  const user = await User.findOne({
+    where: {
+      email: email,
+    },
+  });
+  // const hashedPassword = await bcrypt.hash(password, 10);
+
+  if (!user) {
+    res.status(400);
+    throw new Error("Invalid email or password");
+  } else {
+    console.log("User found: ", user);
+  }
+
+  // compare password with hashed password
+
+  if (user && (await bcrypt.compare(password, user.password))) {
+    const accessToken = jwt.sign(
+      { id: user.id, name: user.name, email: user.email },
+      process.env.JWT_SECRET,
+      {
+        expiresIn: "15m",
+      }
+    );
+
+    res.status(200).json({
+      message: "User logged in",
+      accessToken,
+    });
+  } else {
+    res.status(400);
+    throw new Error("Invalid email or password");
+  }
+});
+
 module.exports = {
   getUsers,
   getUser,
   createUser,
   updateUser,
   deleteUser,
+  loginUser,
 };

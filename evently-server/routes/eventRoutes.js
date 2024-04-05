@@ -7,8 +7,9 @@ const {
   updateEvent,
   deleteEvent,
 } = require("../controllers/eventController");
+const validateTokenHandler = require("../middleware/validateTokenHandler");
 
-// router.use(express.json());
+router.use(validateTokenHandler);
 router.route("/").get(getEvents).post(createEvent);
 router.route("/:id").get(getEvent).put(updateEvent).delete(deleteEvent);
 
